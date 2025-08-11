@@ -1,0 +1,14 @@
+llvmlite
+numba
+nest_asyncio
+requests
+torchaudio
+chatterbox-tts
+flask
+flask_cors
+langchain_ollama
+langchain
+langchain_mcp_adapters
+flask[async]
+uv
+pyOpenSSL
