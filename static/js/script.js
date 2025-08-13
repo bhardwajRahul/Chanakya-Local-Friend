@@ -4,7 +4,7 @@ let callModeButton, statusIndicator, toggleChatButton, chatAreaWrapper, animatio
 let isChatVisible = false;
 let manualIsRecording = false;
 let isKeywordSpottingActive = false;
-let isQuickChanakyaRecording = false;
+let isQuickWakeWordRecording = false;
 let audioPlaybackUnlocked = false;
 let keywordListenToggleButton; 
 let isExplicitlyListeningForKeywords = false; 
@@ -14,11 +14,11 @@ let botIsPlayingInCall = false;
 let callAudioContext;
 let callAnalyserNode, callMicSourceNode, callMediaRecorder, callBotAudio, callStream;
 let manualMediaRecorder, manualAudioChunks = [];
-let quickChanakyaRecorder, quickChanakyaAudioChunks = [], quickChanakyaSilenceTimer;
+let quickWakeWordRecorder, quickWakeWordAudioChunks = [], quickWakeWordSilenceTimer;
 let keywordSpotter;
 let lastBotAudioPlayer = null;
 let isSystemBusy = false;
-const QUICK_CHANAKYA_SILENCE_TIMEOUT_MS = 2500;
+const QUICK_WAKE_WORD_SILENCE_TIMEOUT_MS = 2500;
 const MIN_SILENCE_MS = 2500, SPEECH_LVL_THRESHOLD = 10, INTERRUPT_LVL_THRESHOLD = 18;
 let orb, orbCore; // For the new animation
 let particles1 = [];
@@ -158,14 +158,14 @@ function updateStatus(newStatusText) {
         if (lowerStatus.includes("processing") || 
             lowerStatus.includes("playing") || 
             lowerStatus.includes("bot speaking") || 
-            lowerStatus.includes("chanakya speaking") ||
+            lowerStatus.includes(WAKE_WORD + " speaking") ||
             lowerStatus.includes("sending audio")) {
             orbStateClass = 'speaking';
         } else if (lowerStatus.includes("listening (pause)") ||
                 lowerStatus.includes("user speaking") || 
                 lowerStatus.includes("speaking...") || 
                 lowerStatus.includes("recording") || 
-                lowerStatus.includes("chanakya listening for command...")) {
+                lowerStatus.includes(WAKE_WORD + " listening for command...")) {
             orbStateClass = 'listening';
         } else if (lowerStatus.includes("listening for wake word") || 
                 lowerStatus.includes("ready") ||
@@ -366,10 +366,10 @@ function handleKeyPress(event) { if (event.key === "Enter") { event.preventDefau
 // --- Manual Record Button Functions --- (Ensure updateStatus is used)
 async function toggleRecord() {
     await unlockAudioPlayback(); // Good place for unlock
-    if (isQuickChanakyaRecording && quickChanakyaRecorder && quickChanakyaRecorder.state === "recording") {
-         quickChanakyaRecorder.stop(); // Stop quick command recording if active
+    if (isQuickWakeWordRecording && quickWakeWordRecorder && quickWakeWordRecorder.state === "recording") {
+         quickWakeWordRecorder.stop(); // Stop quick command recording if active
     }
-    isQuickChanakyaRecording = false;
+    isQuickWakeWordRecording = false;
     if (isCallModeActive) { alert("Manual recording disabled during call."); return; }
     if (manualIsRecording) {
         stopManualRecording();
@@ -486,11 +486,11 @@ console.log("toggleCallMode called. Current isCallModeActive:", isCallModeActive
 await unlockAudioPlayback();
 console.log("Audio unlocked for toggleCallMode."); // Log B
 
-if (isQuickChanakyaRecording && quickChanakyaRecorder && quickChanakyaRecorder.state === "recording") {
-    console.log("Stopping active Quick Chanakya recording."); // Log C
-    quickChanakyaRecorder.stop();
+if (isQuickWakeWordRecording && quickWakeWordRecorder && quickWakeWordRecorder.state === "recording") {
+    console.log("Stopping active Quick " + WAKE_WORD + " recording."); // Log C
+    quickWakeWordRecorder.stop();
 }
-isQuickChanakyaRecording = false;
+isQuickWakeWordRecording = false;
 
 if (isCallModeActive) {
     console.log("toggleCallMode: Attempting to stop call."); // Log D
@@ -940,8 +940,8 @@ function initializeKeywordSpotter() {
                 (currentFullTranscript === "bye" || currentFullTranscript === "buy" || currentFullTranscript === "by" ||
                  currentFullTranscript === "bye." || currentFullTranscript === "buy." || currentFullTranscript === "by.")
             );
-            const byePhrase = currentFullTranscript.includes("bye chanakya") || 
-                              currentFullTranscript.includes("goodbye chanakya") || 
+            const byePhrase = currentFullTranscript.includes("bye " + WAKE_WORD) ||
+                              currentFullTranscript.includes("goodbye " + WAKE_WORD) ||
                               currentFullTranscript.includes("okay bye") || 
                               currentFullTranscript.includes("ok, bye") || 
                               currentFullTranscript.includes("bye bye") ||
@@ -968,9 +968,9 @@ function initializeKeywordSpotter() {
         } 
         
         // Idle mode keyword detection (wake words, chanakya alone)
-        if (!isCallModeActive && !manualIsRecording && !isQuickChanakyaRecording && !isQuickCommandActive) {
-            if (currentFullTranscript.includes("hey chanakya") || currentFullTranscript.includes("hi chanakya")) {
-                console.log("Keyword: 'Hey/Hi Chanakya' detected. Triggering call mode.");
+        if (!isCallModeActive && !manualIsRecording && !isQuickWakeWordRecording && !isQuickCommandActive) {
+            if (currentFullTranscript.includes("hey " + WAKE_WORD) || currentFullTranscript.includes("hi " + WAKE_WORD)) {
+                console.log("Keyword: 'Hey/Hi " + WAKE_WORD + "' detected. Triggering call mode.");
                 stopKeywordSpotter(); 
                 toggleCallMode(); // This function will handle further state changes
             } else {
@@ -980,17 +980,17 @@ function initializeKeywordSpotter() {
                 }
                 const chanakyaAloneAsKeyword = 
                     lastResultIsFinal && 
-                    (normalizedTranscript === "chanakya" || normalizedTranscript.startsWith("chanakya ")) && 
-                    !(currentFullTranscript.includes("hey chanakya") || currentFullTranscript.includes("hi chanakya"));
+                    (normalizedTranscript === WAKE_WORD || normalizedTranscript.startsWith(WAKE_WORD + " ")) &&
+                    !(currentFullTranscript.includes("hey " + WAKE_WORD) || currentFullTranscript.includes("hi " + WAKE_WORD));
                                         
                 if (chanakyaAloneAsKeyword) {
-                     console.log("Keyword: 'Chanakya' (alone, final, normalized) detected. Triggering short record.");
+                     console.log("Keyword: '" + WAKE_WORD + "' (alone, final, normalized) detected. Triggering short record.");
                      stopKeywordSpotter(); 
-                     triggerQuickChanakyaRecording();
+                     triggerQuickWakeWordRecording();
                 } else if (!lastResultIsFinal && 
-                           currentFullTranscript.includes("chanakya") && 
-                           !(currentFullTranscript.includes("hey chanakya") || currentFullTranscript.includes("hi chanakya"))) {
-                    updateStatus("Chanakya heard..."); 
+                           currentFullTranscript.includes(WAKE_WORD) &&
+                           !(currentFullTranscript.includes("hey " + WAKE_WORD) || currentFullTranscript.includes("hi " + WAKE_WORD))) {
+                    updateStatus(WAKE_WORD + " heard...");
                 }
             }
         }
@@ -1187,42 +1187,42 @@ async function handleToggleKeywordListening() {
     console.log("handleToggleKeywordListening finished. New isExplicitlyListeningForKeywords:", isExplicitlyListeningForKeywords);
 }
 
-async function triggerQuickChanakyaRecording() {
+async function triggerQuickWakeWordRecording() {
     // ... (ensure updateStatus is used)
     // ... (ensure isQuickCommandActive is reset in all paths of onstop)
-    if (isQuickCommandActive || isCallModeActive || manualIsRecording || isQuickChanakyaRecording) return;
+    if (isQuickCommandActive || isCallModeActive || manualIsRecording || isQuickWakeWordRecording) return;
     await unlockAudioPlayback(); // Ensure audio is unlocked
-    isQuickChanakyaRecording = true; updateStatus("Chanakya listening for command...");
+    isQuickWakeWordRecording = true; updateStatus(WAKE_WORD + " listening for command...");
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        quickChanakyaAudioChunks = [];
-        quickChanakyaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-        quickChanakyaRecorder.ondataavailable = (e) => { if (e.data.size > 0) quickChanakyaAudioChunks.push(e.data); };
-        quickChanakyaRecorder.onstop = async () => {
-            isQuickChanakyaRecording = false; 
+        quickWakeWordAudioChunks = [];
+        quickWakeWordRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+        quickWakeWordRecorder.ondataavailable = (e) => { if (e.data.size > 0) quickWakeWordAudioChunks.push(e.data); };
+        quickWakeWordRecorder.onstop = async () => {
+            isQuickWakeWordRecording = false;
             stream.getTracks().forEach(track => track.stop());
-            if (quickChanakyaAudioChunks.length === 0) {
-                appendMessage("You (Audio to Chanakya): (No speech detected)", "user");
+            if (quickWakeWordAudioChunks.length === 0) {
+                appendMessage("You (Audio to " + WAKE_WORD + "): (No speech detected)", "user");
                 updateStatus("No command heard."); 
                 isQuickCommandActive = false; 
                 if (!isCallModeActive && !manualIsRecording && isExplicitlyListeningForKeywords) startKeywordSpotter();
                 else if (!isCallModeActive && !manualIsRecording) updateStatus("Ready.");
                 return;
             }
-            updateStatus("Chanakya processing command...");
-            const audioBlob = new Blob(quickChanakyaAudioChunks, { type: quickChanakyaRecorder.mimeType });
-            quickChanakyaAudioChunks = [];
-            const formData = new FormData(); formData.append('audio', audioBlob, 'chanakya_command.webm');
+            updateStatus(WAKE_WORD + " processing command...");
+            const audioBlob = new Blob(quickWakeWordAudioChunks, { type: quickWakeWordRecorder.mimeType });
+            quickWakeWordAudioChunks = [];
+            const formData = new FormData(); formData.append('audio', audioBlob, WAKE_WORD + '_command.webm');
             try {
                 const serverResponse = await fetch('/record', { method: 'POST', body: formData });
                 const data = await serverResponse.json();
-                if (data.error) { appendMessage(`Chanakya Error: ${data.error}`, "bot"); updateStatus("Error processing command.");}
+                if (data.error) { appendMessage(`${WAKE_WORD} Error: ${data.error}`, "bot"); updateStatus("Error processing command.");}
                 else {
                     if (data.transcription) appendMessage(data.transcription, "user");
                     appendMessage(data.response, "bot");
                     if (data.audio_data_url) {
                         const commandResponseAudio = new Audio(data.audio_data_url);
-                        updateStatus("Chanakya speaking...");
+                        updateStatus(WAKE_WORD + " speaking...");
                         try {
                             await commandResponseAudio.play();
                             commandResponseAudio.onended = () => { 
@@ -1231,21 +1231,21 @@ async function triggerQuickChanakyaRecording() {
                                 if (!isCallModeActive && !manualIsRecording && isExplicitlyListeningForKeywords) startKeywordSpotter(); 
                                 else if (!isCallModeActive && !manualIsRecording) updateStatus("Ready.");
                             };
-                            commandResponseAudio.onerror = (e) => { console.error(e); updateStatus("Chanakya audio error."); isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording) startKeywordSpotter(); };
+                            commandResponseAudio.onerror = (e) => { console.error(e); updateStatus(WAKE_WORD + " audio error."); isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording) startKeywordSpotter(); };
                         } catch (playError) {
                              console.error("Quick command play error:", playError); updateStatus("Audio play blocked."); isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording) startKeywordSpotter();
                         }
                     } else { 
-                        updateStatus("Chanakya processed (no speech)."); 
+                        updateStatus(WAKE_WORD + " processed (no speech).");
                         isQuickCommandActive = false; 
                         if (!isCallModeActive && !manualIsRecording && isExplicitlyListeningForKeywords) startKeywordSpotter(); 
                         else if (!isCallModeActive && !manualIsRecording) updateStatus("Ready.");
                     }
                 }
-            } catch (error) { console.error(error); appendMessage("Chanakya Error: Network issue.", "bot"); updateStatus("Network error."); isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording && isExplicitlyListeningForKeywords) startKeywordSpotter(); else if (!isCallModeActive && !manualIsRecording) updateStatus("Ready.");}
+            } catch (error) { console.error(error); appendMessage(WAKE_WORD + " Error: Network issue.", "bot"); updateStatus("Network error."); isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording && isExplicitlyListeningForKeywords) startKeywordSpotter(); else if (!isCallModeActive && !manualIsRecording) updateStatus("Ready.");}
             isQuickCommandActive = false; // Ensure reset
         };
-        quickChanakyaRecorder.start(); clearTimeout(quickChanakyaSilenceTimer);
+        quickWakeWordRecorder.start(); clearTimeout(quickWakeWordSilenceTimer);
         let lastSpeechTime = Date.now();
         let qcraContext = callAudioContext && callAudioContext.state === 'running' ? callAudioContext : new (window.AudioContext || window.webkitAudioContext)();
         if (qcraContext.state === 'suspended') await qcraContext.resume();
@@ -1253,17 +1253,17 @@ async function triggerQuickChanakyaRecording() {
         const qcraAnalyser = qcraContext.createAnalyser();
         qcraAnalyser.fftSize = 512; qcraMicSource.connect(qcraAnalyser);
         function monitorQuickCommandAudio() {
-            if (!isQuickChanakyaRecording) { qcraMicSource.disconnect(); return; }
+            if (!isQuickWakeWordRecording) { qcraMicSource.disconnect(); return; }
             const dataArray = new Uint8Array(qcraAnalyser.frequencyBinCount);
             qcraAnalyser.getByteTimeDomainData(dataArray);
             let sum = 0; dataArray.forEach(val => sum += Math.abs(val - 128));
             if (sum / dataArray.length > SPEECH_LVL_THRESHOLD / 2) lastSpeechTime = Date.now();
-            if (Date.now() - lastSpeechTime > QUICK_CHANAKYA_SILENCE_TIMEOUT_MS) {
-                if (quickChanakyaRecorder.state === "recording") quickChanakyaRecorder.stop();
+            if (Date.now() - lastSpeechTime > QUICK_WAKE_WORD_SILENCE_TIMEOUT_MS) {
+                if (quickWakeWordRecorder.state === "recording") quickWakeWordRecorder.stop();
             } else requestAnimationFrame(monitorQuickCommandAudio);
         }
         requestAnimationFrame(monitorQuickCommandAudio);
-    } catch (error) { console.error(error); updateStatus("Mic error for Chanakya."); isQuickChanakyaRecording = false; isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording) startKeywordSpotter(); }
+    } catch (error) { console.error(error); updateStatus("Mic error for " + WAKE_WORD + "."); isQuickWakeWordRecording = false; isQuickCommandActive = false; if (!isCallModeActive && !manualIsRecording) startKeywordSpotter(); }
 }
 
 // Initial Load

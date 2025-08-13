@@ -7,6 +7,7 @@ load_dotenv()
 # General App Config
 APP_SECRET_KEY = os.environ.get('APP_SECRET_KEY', str(os.urandom(24))) # Use env var or generate
 DEBUG_MODE = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
+WAKE_WORD = os.environ.get('WAKE_WORD', "Chanakya")
 
 # Ollama Configuration
 OLLAMA_ENDPOINT = os.environ.get('OLLAMA_ENDPOINT')
