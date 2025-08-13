@@ -971,7 +971,7 @@ function initializeKeywordSpotter() {
         
         // Idle mode keyword detection (wake words, chanakya alone)
         if (!isCallModeActive && !manualIsRecording && !isQuickWakeWordRecording && !isQuickCommandActive) {
-            if (currentFullTranscript.includes("hey " + WAKE_WORD) || currentFullTranscript.includes("hi " + WAKE_WORD)) {
+            if (currentFullTranscript.includes("hey " + WAKE_WORD) || currentFullTranscript.includes("hi " + WAKE_WORD) || currentFullTranscript.includes("hey, " + WAKE_WORD) || currentFullTranscript.includes("hi, " + WAKE_WORD)) {
                 console.log("Keyword: 'Hey/Hi " + WAKE_WORD + "' detected. Triggering call mode.");
                 stopKeywordSpotter(); 
                 toggleCallMode(); // This function will handle further state changes
