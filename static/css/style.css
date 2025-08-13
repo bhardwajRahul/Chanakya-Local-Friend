@@ -179,13 +179,11 @@ body {
 #chat-area pre.user-message {
     background: var(--user-message-bg);
     color: var(--text-color);
-    align-self: flex-end; /* Messages on the right */
     border-bottom-right-radius: 5px;
 }
 #chat-area pre.bot-message {
     background: var(--bot-message-bg);
     color: var(--text-color);
-    align-self: flex-start; /* Messages on the left */
     border-bottom-left-radius: 5px;
 
 }
@@ -401,3 +399,43 @@ body {
     100% { transform: rotate(360deg) translate(75px, 0); }
 }
 
+/* Tool Tags Styling */
+.message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.bot-message-container {
+    align-items: flex-start;
+}
+
+.user-message-container {
+    align-items: flex-end;
+}
+
+.tool-tags-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    margin-left: 10px; /* Align with bot message padding */
+    max-width: 100%;
+}
+
+.tool-tag-title {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--status-color);
+    margin-right: 5px;
+}
+
+.tool-tag {
+    background-color: var(--accent-bg);
+    color: var(--text-color);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}

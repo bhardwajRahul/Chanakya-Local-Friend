@@ -311,17 +311,42 @@ function applyDarkModePreference() {
 }
 
 // --- NO standalone applyDarkModePreference(); call here ---
-function appendMessage(text, sender) {
-    if (!chatArea) return; // Guard against chatArea not being ready
+function appendMessage(text, sender, data) {
+    if (!chatArea) return;
+
+    const messageContainer = document.createElement("div");
+    messageContainer.className = `message-container ${sender}-message-container`;
+
     const messageElement = document.createElement("pre");
     messageElement.textContent = text;
     messageElement.className = sender === "user" ? "user-message" : "bot-message";
+    messageContainer.appendChild(messageElement);
+
+    if (sender === 'bot' && data && data.used_tools && data.used_tools.length > 0) {
+        const toolsContainer = document.createElement('div');
+        toolsContainer.className = 'tool-tags-container';
+
+        const usedToolsTitle = document.createElement('span');
+        usedToolsTitle.className = 'tool-tag-title';
+        usedToolsTitle.textContent = 'Tools:';
+        toolsContainer.appendChild(usedToolsTitle);
+
+        data.used_tools.forEach(toolName => {
+            const toolTag = document.createElement('span');
+            toolTag.className = 'tool-tag';
+            toolTag.textContent = toolName;
+            toolsContainer.appendChild(toolTag);
+        });
+        messageContainer.appendChild(toolsContainer);
+    }
+
     const isScrolledToBottom = chatArea.scrollHeight - chatArea.clientHeight <= chatArea.scrollTop + 1;
     if (chatArea.firstChild) {
-        chatArea.insertBefore(messageElement, chatArea.firstChild);
+        chatArea.insertBefore(messageContainer, chatArea.firstChild);
     } else {
-        chatArea.appendChild(messageElement);
+        chatArea.appendChild(messageContainer);
     }
+
     if (isChatVisible && isScrolledToBottom) {
         scrollToBottom();
     }
@@ -340,26 +365,13 @@ async function sendMessage() {
     stopKeywordSpotter();
     messageInput.value = "";
     appendMessage(message, "user");
-    let toolsUsed = false;
     try {
         const response = await fetch("/chat", {
             method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: "message=" + encodeURIComponent(message)
         });
         const data = await response.json();
-        appendMessage(data.error ? `Error: ${data.error}` : data.response, "bot");
-
-        if (data.used_tools && data.used_tools.length > 0) {
-            toolsUsed = true;
-            const originalStatus = statusIndicator.textContent;
-            const toolsString = data.used_tools.join(', ');
-            updateStatus(`Tools used: ${toolsString}`);
-            setTimeout(() => {
-                if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
-                    updateStatus(originalStatus);
-                }
-            }, 2000);
-        }
+        appendMessage(data.error ? `Error: ${data.error}` : data.response, "bot", data);
     } catch (error) {
         console.error("Error sending message:", error);
         appendMessage("Error: Could not connect.", "bot");
@@ -367,7 +379,7 @@ async function sendMessage() {
         // Only restart keyword spotter if not in call mode and it was the intended state
         if (!isCallModeActive && isExplicitlyListeningForKeywords) { // isExplicitlyListeningForKeywords is your toggle button state
             startKeywordSpotter();
-        } else if (!isCallModeActive && !toolsUsed) {
+        } else if (!isCallModeActive) {
             updateStatus("Ready."); // Or whatever idle status is appropriate
         }
         // If in call mode, listening is managed by VAD (processCallAudio)
@@ -406,7 +418,6 @@ async function startManualRecording() {
             updateStatus("Sending audio...");
             const audioBlob = new Blob(manualAudioChunks, { type: 'audio/wav' });
             const formData = new FormData(); formData.append('audio', audioBlob, 'manual.wav');
-            let toolsUsed = false;
             try {
                 const response = await fetch('/record', { method: 'POST', body: formData });
                 const data = await response.json();
@@ -414,23 +425,12 @@ async function startManualRecording() {
                     appendMessage(`Error: ${data.error}`, "bot");
                 } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
-                    appendMessage(data.response, "bot");
-                    if (data.used_tools && data.used_tools.length > 0) {
-                        toolsUsed = true;
-                        const originalStatus = statusIndicator.textContent;
-                        const toolsString = data.used_tools.join(', ');
-                        updateStatus(`Tools used: ${toolsString}`);
-                        setTimeout(() => {
-                            if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
-                                updateStatus(originalStatus);
-                            }
-                        }, 2000);
-                    }
+                    appendMessage(data.response, "bot", data);
                 }
             } catch (e) { appendMessage("Error sending audio.", "bot"); console.error(e); }
             if (!isCallModeActive && isExplicitlyListeningForKeywords) {
                 startKeywordSpotter();
-            } else if (!isCallModeActive && !toolsUsed) {
+            } else if (!isCallModeActive) {
                 updateStatus("Ready.");
             }
         };
@@ -623,17 +623,7 @@ async function startCall() {
                     updateStatus("Error processing your speech."); 
                 } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
-                    appendMessage(data.response, "bot");
-                    if (data.used_tools && data.used_tools.length > 0) {
-                        const originalStatus = statusIndicator.textContent;
-                        const toolsString = data.used_tools.join(', ');
-                        updateStatus(`Tools used: ${toolsString}`);
-                        setTimeout(() => {
-                            if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
-                                updateStatus(originalStatus);
-                            }
-                        }, 2000);
-                    }
+                    appendMessage(data.response, "bot", data);
                     if (data.audio_data_url) {
                         botWillSpeak = true;
                         // playBotInCall will set botIsPlayingInCall and also manage isSystemBusy
