@@ -340,6 +340,7 @@ async function sendMessage() {
     stopKeywordSpotter();
     messageInput.value = "";
     appendMessage(message, "user");
+    let toolsUsed = false;
     try {
         const response = await fetch("/chat", {
             method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -347,6 +348,18 @@ async function sendMessage() {
         });
         const data = await response.json();
         appendMessage(data.error ? `Error: ${data.error}` : data.response, "bot");
+
+        if (data.used_tools && data.used_tools.length > 0) {
+            toolsUsed = true;
+            const originalStatus = statusIndicator.textContent;
+            const toolsString = data.used_tools.join(', ');
+            updateStatus(`Tools used: ${toolsString}`);
+            setTimeout(() => {
+                if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
+                    updateStatus(originalStatus);
+                }
+            }, 2000);
+        }
     } catch (error) {
         console.error("Error sending message:", error);
         appendMessage("Error: Could not connect.", "bot");
@@ -354,7 +367,7 @@ async function sendMessage() {
         // Only restart keyword spotter if not in call mode and it was the intended state
         if (!isCallModeActive && isExplicitlyListeningForKeywords) { // isExplicitlyListeningForKeywords is your toggle button state
             startKeywordSpotter();
-        } else if (!isCallModeActive) {
+        } else if (!isCallModeActive && !toolsUsed) {
             updateStatus("Ready."); // Or whatever idle status is appropriate
         }
         // If in call mode, listening is managed by VAD (processCallAudio)
@@ -393,18 +406,31 @@ async function startManualRecording() {
             updateStatus("Sending audio...");
             const audioBlob = new Blob(manualAudioChunks, { type: 'audio/wav' });
             const formData = new FormData(); formData.append('audio', audioBlob, 'manual.wav');
+            let toolsUsed = false;
             try {
                 const response = await fetch('/record', { method: 'POST', body: formData });
                 const data = await response.json();
-                if (data.error) appendMessage(`Error: ${data.error}`, "bot");
-                else {
+                if (data.error) {
+                    appendMessage(`Error: ${data.error}`, "bot");
+                } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
                     appendMessage(data.response, "bot");
+                    if (data.used_tools && data.used_tools.length > 0) {
+                        toolsUsed = true;
+                        const originalStatus = statusIndicator.textContent;
+                        const toolsString = data.used_tools.join(', ');
+                        updateStatus(`Tools used: ${toolsString}`);
+                        setTimeout(() => {
+                            if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
+                                updateStatus(originalStatus);
+                            }
+                        }, 2000);
+                    }
                 }
             } catch (e) { appendMessage("Error sending audio.", "bot"); console.error(e); }
             if (!isCallModeActive && isExplicitlyListeningForKeywords) {
                 startKeywordSpotter();
-            } else if (!isCallModeActive) {
+            } else if (!isCallModeActive && !toolsUsed) {
                 updateStatus("Ready.");
             }
         };
@@ -598,6 +624,16 @@ async function startCall() {
                 } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
                     appendMessage(data.response, "bot");
+                    if (data.used_tools && data.used_tools.length > 0) {
+                        const originalStatus = statusIndicator.textContent;
+                        const toolsString = data.used_tools.join(', ');
+                        updateStatus(`Tools used: ${toolsString}`);
+                        setTimeout(() => {
+                            if (statusIndicator.textContent === `Tools used: ${toolsString}`) {
+                                updateStatus(originalStatus);
+                            }
+                        }, 2000);
+                    }
                     if (data.audio_data_url) {
                         botWillSpeak = true;
                         // playBotInCall will set botIsPlayingInCall and also manage isSystemBusy

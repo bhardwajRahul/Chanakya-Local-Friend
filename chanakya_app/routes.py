@@ -93,8 +93,8 @@ Current date and time: {current_dt_str}"""
         ), timeout=20)
         app.logger.info(f"CHAT - Raw Chanakya ReAct AgentExecutor async response: {response_payload}")
 
+        used_tools_in_turn = set()
         if "intermediate_steps" in response_payload and response_payload["intermediate_steps"]:
-            used_tools_in_turn = set()
             for step in response_payload["intermediate_steps"]:
                 if isinstance(step, tuple) and len(step) > 0 and isinstance(step[0], AgentAction):
                     used_tools_in_turn.add(step[0].tool)
@@ -108,7 +108,7 @@ Current date and time: {current_dt_str}"""
         utils_module.last_ai_response = get_plain_text_content(response_payload)
         app.logger.info(f"CHAT - Final text response: {utils_module.last_ai_response}")
 
-        return jsonify({"response": utils_module.last_ai_response})
+        return jsonify({"response": utils_module.last_ai_response, "used_tools": list(used_tools_in_turn)})
     except RuntimeError as e:
         if "Event loop is closed" in str(e):
             app.logger.error(f"EVENT LOOP CLOSED ERROR in /chat: {e}", exc_info=True)
@@ -186,8 +186,13 @@ Current date and time: {current_dt_str}"""
             app.logger.info(f"RECORD - Raw Chanakya ReAct AgentExecutor async response: {response_payload}")
             utils_module.last_ai_response = get_plain_text_content(response_payload)
             app.logger.info(f"RECORD - Final text response: {utils_module.last_ai_response}")
+
+            used_tools_in_turn = set()
             if "intermediate_steps" in response_payload and response_payload["intermediate_steps"]:
-                 app.logger.info(f"RECORD - Intermediate steps: {response_payload['intermediate_steps']}")
+                app.logger.info(f"RECORD - Intermediate steps: {response_payload['intermediate_steps']}")
+                for step in response_payload["intermediate_steps"]:
+                    if isinstance(step, tuple) and len(step) > 0 and isinstance(step[0], AgentAction):
+                        used_tools_in_turn.add(step[0].tool)
 
             bot_speech_audio_data_url = None
             if utils_module.last_ai_response:
@@ -197,7 +202,7 @@ Current date and time: {current_dt_str}"""
                     audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
                     bot_speech_audio_data_url = f"data:audio/wav;base64,{audio_base64}"
                 else: app.logger.error(f"TTS failed in /record")
-            return jsonify({"response": utils_module.last_ai_response, "transcription": transcription, "audio_data_url": bot_speech_audio_data_url})
+            return jsonify({"response": utils_module.last_ai_response, "transcription": transcription, "audio_data_url": bot_speech_audio_data_url, "used_tools": list(used_tools_in_turn)})
         except RuntimeError as e:
              if "Event loop is closed" in str(e):
                 app.logger.error(f"EVENT LOOP CLOSED ERROR in /record: {e}", exc_info=True)
