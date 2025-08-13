@@ -311,17 +311,47 @@ function applyDarkModePreference() {
 }
 
 // --- NO standalone applyDarkModePreference(); call here ---
-function appendMessage(text, sender) {
-    if (!chatArea) return; // Guard against chatArea not being ready
+function appendMessage(text, sender, data) {
+    if (!chatArea) return;
+
+    const messageContainer = document.createElement("div");
+    messageContainer.className = `message-container ${sender}-message-container`;
+
     const messageElement = document.createElement("pre");
     messageElement.textContent = text;
     messageElement.className = sender === "user" ? "user-message" : "bot-message";
+    messageContainer.appendChild(messageElement);
+
+    if (sender === 'bot' && data && data.used_tools && data.used_tools.length > 0) {
+        const toolsContainer = document.createElement('div');
+        toolsContainer.className = 'tool-tags-container';
+
+        const usedToolsTitle = document.createElement('span');
+        usedToolsTitle.className = 'tool-tag-title';
+        usedToolsTitle.textContent = 'Tools:';
+        toolsContainer.appendChild(usedToolsTitle);
+
+        data.used_tools.forEach((toolName, index) => {
+            const toolTag = document.createElement('span');
+            toolTag.className = 'tool-tag';
+            toolTag.textContent = toolName;
+            toolsContainer.appendChild(toolTag);
+
+            if (index < data.used_tools.length - 1) {
+                const comma = document.createTextNode(', ');
+                toolsContainer.appendChild(comma);
+            }
+        });
+        messageContainer.appendChild(toolsContainer);
+    }
+
     const isScrolledToBottom = chatArea.scrollHeight - chatArea.clientHeight <= chatArea.scrollTop + 1;
     if (chatArea.firstChild) {
-        chatArea.insertBefore(messageElement, chatArea.firstChild);
+        chatArea.insertBefore(messageContainer, chatArea.firstChild);
     } else {
-        chatArea.appendChild(messageElement);
+        chatArea.appendChild(messageContainer);
     }
+
     if (isChatVisible && isScrolledToBottom) {
         scrollToBottom();
     }
@@ -346,7 +376,7 @@ async function sendMessage() {
             body: "message=" + encodeURIComponent(message)
         });
         const data = await response.json();
-        appendMessage(data.error ? `Error: ${data.error}` : data.response, "bot");
+        appendMessage(data.error ? `Error: ${data.error}` : data.response, "bot", data);
     } catch (error) {
         console.error("Error sending message:", error);
         appendMessage("Error: Could not connect.", "bot");
@@ -396,10 +426,11 @@ async function startManualRecording() {
             try {
                 const response = await fetch('/record', { method: 'POST', body: formData });
                 const data = await response.json();
-                if (data.error) appendMessage(`Error: ${data.error}`, "bot");
-                else {
+                if (data.error) {
+                    appendMessage(`Error: ${data.error}`, "bot");
+                } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
-                    appendMessage(data.response, "bot");
+                    appendMessage(data.response, "bot", data);
                 }
             } catch (e) { appendMessage("Error sending audio.", "bot"); console.error(e); }
             if (!isCallModeActive && isExplicitlyListeningForKeywords) {
@@ -597,7 +628,7 @@ async function startCall() {
                     updateStatus("Error processing your speech."); 
                 } else {
                     if (data.transcription) appendMessage(data.transcription, "user");
-                    appendMessage(data.response, "bot");
+                    appendMessage(data.response, "bot", data);
                     if (data.audio_data_url) {
                         botWillSpeak = true;
                         // playBotInCall will set botIsPlayingInCall and also manage isSystemBusy

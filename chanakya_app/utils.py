@@ -15,6 +15,7 @@ def get_plain_text_content(response_object):
         raw_text = str(response_object).strip()
     cleaned_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL)
     cleaned_text = re.sub(r'<think\s*/>', '', cleaned_text)
+    cleaned_text = re.sub(r'<tool_call>.*', '', cleaned_text, flags=re.DOTALL)
     cleaned_text = re.sub(r'\*{1,2}(.*?)\*{1,2}', r'\1', cleaned_text)
     cleaned_text = re.sub(r'_(.*?)_', r'\1', cleaned_text)
     cleaned_text = re.sub(r'`(.*?)`', r'\1', cleaned_text)
