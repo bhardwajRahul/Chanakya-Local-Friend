@@ -1035,7 +1035,7 @@ function initializeKeywordSpotter() {
         const wasOurLogicExpectingItToBeActive = isKeywordSpottingActive; 
         isKeywordSpottingActive = false; 
 
-        const shouldBeIdleSpotting = isExplicitlyListeningForKeywords && !isCallModeActive && !manualIsRecording && !isQuickChanakyaRecording && !isQuickCommandActive && !isSystemBusy;
+        const shouldBeIdleSpotting = isExplicitlyListeningForKeywords && !isCallModeActive && !manualIsRecording && !isQuickWakeWordRecording && !isQuickCommandActive && !isSystemBusy;
         const shouldBeInCallByeSpotting = isExplicitlyListeningForKeywords && isCallModeActive && !botIsPlayingInCall && !isSystemBusy;
 
         if (wasOurLogicExpectingItToBeActive && (shouldBeIdleSpotting || shouldBeInCallByeSpotting)) {
@@ -1056,7 +1056,7 @@ function initializeKeywordSpotter() {
                 } else { // User explicitly turned it off or it was never on via toggle
                     keywordListenToggleButton.textContent = "👂";
                 }
-                if (!isCallModeActive && !isQuickChanakyaRecording && !manualIsRecording && !isKeywordSpottingActive) {
+                if (!isCallModeActive && !isQuickWakeWordRecording && !manualIsRecording && !isKeywordSpottingActive) {
                     updateStatus("Ready.");
                 }
             }
