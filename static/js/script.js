@@ -1007,7 +1007,7 @@ function initializeKeywordSpotter() {
         if (event.error === 'no-speech' || event.error === 'audio-capture') {
             if (wasIntendedToBeActive) { // If it was supposed to be running
                  // Attempt to restart only if conditions are still valid for it to run
-                const shouldBeIdleSpotting = isExplicitlyListeningForKeywords && !isCallModeActive && !manualIsRecording && !isQuickChanakyaRecording && !isQuickCommandActive;
+                const shouldBeIdleSpotting = isExplicitlyListeningForKeywords && !isCallModeActive && !manualIsRecording && !isQuickWakeWordRecording && !isQuickCommandActive;
                 const shouldBeInCallByeSpotting = isExplicitlyListeningForKeywords && isCallModeActive && !botIsPlayingInCall && !isSystemBusy;
 
                 if (shouldBeIdleSpotting) {
@@ -1136,7 +1136,7 @@ function stopKeywordSpotter() {
             if (keywordListenToggleButton && !isCallModeActive) { // Only update main toggle if not in call
                  keywordListenToggleButton.textContent = "👂";
             }
-            if (!isCallModeActive && !manualIsRecording && !isQuickChanakyaRecording && !isQuickCommandActive) {
+            if (!isCallModeActive && !manualIsRecording && !isQuickWakeWordRecording && !isQuickCommandActive) {
                 updateStatus("Keyword listening stopped (error).");
             }
         }
