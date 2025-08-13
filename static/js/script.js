@@ -942,6 +942,8 @@ function initializeKeywordSpotter() {
             );
             const byePhrase = currentFullTranscript.includes("bye " + WAKE_WORD) ||
                               currentFullTranscript.includes("goodbye " + WAKE_WORD) ||
+                              currentFullTranscript.includes("bye, " + WAKE_WORD) ||
+                              currentFullTranscript.includes("goodbye, " + WAKE_WORD) ||
                               currentFullTranscript.includes("okay bye") || 
                               currentFullTranscript.includes("ok, bye") || 
                               currentFullTranscript.includes("bye bye") ||
