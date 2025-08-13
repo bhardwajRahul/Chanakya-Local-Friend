@@ -39,7 +39,7 @@
         </div>
         <div class="status-indicator" id="statusIndicator">Initializing...</div>
         <div class="input-container">
-            <input type="text" id="message-input" placeholder="Type or say 'Chanakya'..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="message-input" placeholder="Type or say '{{ wake_word }}'..." onkeypress="handleKeyPress(event)">
             <button id="sendButton" title="Send Text">✉️</button>
             <button id="recordButton" title="Manual Record">🎤</button>
             <button id="playResponseButton" title="Play Last Response">🔊</button>
@@ -50,6 +50,9 @@
 
     <!-- Link to your external JavaScript file -->
     <!-- 'defer' attribute ensures script executes after HTML is parsed but before DOMContentLoaded -->
+    <script>
+        const WAKE_WORD = "{{ wake_word.lower() }}";
+    </script>
     <script src="{{ url_for('static', filename='js/script.js') }}?{{ timestamp }}" defer></script>
 </body>
 </html>

@@ -22,7 +22,7 @@ from langchain_core.agents import AgentAction
 @app.route('/')
 def index():
     update_client_activity(request.remote_addr)
-    return render_template("index_full_chat.html", timestamp=datetime.datetime.now().timestamp())
+    return render_template("index_full_chat.html", timestamp=datetime.datetime.now().timestamp(), wake_word=config.WAKE_WORD)
 
 def background_thread():
     last_save_time = time.time()
@@ -65,7 +65,7 @@ async def chat():
         relevant_memories = retrieve_relevant_memories(memory_search_query)
 
         current_dt_str = datetime.datetime.now().strftime("%Y-%m-%d, %I:%M:%S %p")
-        dynamic_intro = f"""You are a conversational AI voice assistant named Chanakya. Created by Dr. Rishabh Bajpai.
+        dynamic_intro = f"""You are a conversational AI voice assistant named {config.WAKE_WORD}. Created by Dr. Rishabh Bajpai.
 Your primary mode of interaction with the user is through voice (a phone call). Craft responses to be clear, concise, and natural-sounding.
 Use shorter sentences and standard punctuation for natural pauses. Avoid complex sentence structures, markdown, or emojis.
 Keep responses brief and conversational.
@@ -159,7 +159,7 @@ async def record():
             relevant_memories = retrieve_relevant_memories(memory_search_query)
 
             current_dt_str = datetime.datetime.now().strftime("%Y-%m-%d, %I:%M:%S %p")
-            dynamic_intro = f"""You are a conversational AI voice assistant named Chanakya. Created by Dr. Rishabh Bajpai.
+            dynamic_intro = f"""You are a conversational AI voice assistant named {config.WAKE_WORD}. Created by Dr. Rishabh Bajpai.
 Your primary mode of interaction with the user is through voice (a phone call). Craft responses to be clear, concise, and natural-sounding.
 Use shorter sentences and standard punctuation for natural pauses. Avoid complex sentence structures, markdown, or emojis.
 Keep responses brief and conversational.
