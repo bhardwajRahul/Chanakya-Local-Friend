@@ -1075,7 +1075,7 @@ function startKeywordSpotter(options = {}) {
 
     // Apply other guards based on purpose
     if (!forInCallByeDetection) { 
-        if (isCallModeActive || manualIsRecording || isQuickCommandActive || isQuickChanakyaRecording) {
+        if (isCallModeActive || manualIsRecording || isQuickCommandActive || isQuickWakeWordRecording) {
             console.log("Cannot start idle keyword spotter: conflicting mode active.");
             return false;
         }
