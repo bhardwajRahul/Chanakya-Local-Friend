@@ -407,11 +407,11 @@ body {
 }
 
 .bot-message-container {
-    align-items: flex-start;
+    align-self: flex-start;
 }
 
 .user-message-container {
-    align-items: flex-end;
+    align-self: flex-end;
 }
 
 .tool-tags-container {

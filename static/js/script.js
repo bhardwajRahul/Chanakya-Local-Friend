@@ -331,11 +331,16 @@ function appendMessage(text, sender, data) {
         usedToolsTitle.textContent = 'Tools:';
         toolsContainer.appendChild(usedToolsTitle);
 
-        data.used_tools.forEach(toolName => {
+        data.used_tools.forEach((toolName, index) => {
             const toolTag = document.createElement('span');
             toolTag.className = 'tool-tag';
             toolTag.textContent = toolName;
             toolsContainer.appendChild(toolTag);
+
+            if (index < data.used_tools.length - 1) {
+                const comma = document.createTextNode(', ');
+                toolsContainer.appendChild(comma);
+            }
         });
         messageContainer.appendChild(toolsContainer);
     }
