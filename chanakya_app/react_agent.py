@@ -37,6 +37,8 @@ Final Answer: [your response to the user]
 - If an Observation contains a parsing error, your PREVIOUS response was malformed. Your NEW response MUST start with a "Thought:" explaining your correction, followed by a valid "Action:" block or "Final Answer:".
 - If an Observation is a tool error, start your NEW response with "Thought:" to analyze it, then proceed with a corrected "Action:" or a "Final Answer:".
 
+Tool specific instructions: {tool_instructions}
+
 ALWAYS PROVIDE THE CORRECT ARGUMENTS AS REQUIRED BY THE TOOL. Refer to the tool descriptions for argument details.
 Begin!
 
@@ -185,7 +187,21 @@ def get_chanakya_react_agent_with_history():
     if not current_tools:
         app.logger.warning("Creating Chanakya ReAct agent with NO tools available!")
 
-    react_prompt_template = PromptTemplate.from_template(REACT_AGENT_PROMPT_TEMPLATE_STR)
+    tool_instructions = ""
+    try:
+        # Assuming the app is run from the project root directory
+        with open("tool_specific_instructions.txt", "r", encoding="utf-8") as f:
+            tool_instructions = f.read().strip()
+        app.logger.info("Successfully loaded tool-specific instructions.")
+    except FileNotFoundError:
+        app.logger.warning("'tool_specific_instructions.txt' not found. Proceeding without tool instructions.")
+    except Exception as e:
+        app.logger.error(f"Error loading tool-specific instructions: {e}")
+
+    react_prompt_template = PromptTemplate.from_template(
+        template=REACT_AGENT_PROMPT_TEMPLATE_STR,
+        partial_variables={"tool_instructions": tool_instructions}
+    )
 
     agent_chain = (
         RunnablePassthrough.assign(

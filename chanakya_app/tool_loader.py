@@ -56,6 +56,7 @@ async def load_all_mcp_tools_async(force_reload=False) -> List[BaseTool]:
         mcp_tool_descriptions_for_llm = render_text_description(CACHED_MCP_TOOLS)
         mcp_tool_names_for_llm = ", ".join([t.name for t in CACHED_MCP_TOOLS])
         app.logger.info(f"Loaded {len(CACHED_MCP_TOOLS)} MCP tools for Chanakya: {[t.name for t in CACHED_MCP_TOOLS]}")
+        app.logger.info(f"Tools descriptions: {mcp_tool_descriptions_for_llm}")
     else:
         mcp_tool_descriptions_for_llm = "No specialized tools are currently available."
         mcp_tool_names_for_llm = ""
