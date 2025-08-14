@@ -21,10 +21,10 @@ If you would like to contribute, please follow these steps:
 
 5.  **Submit a Pull Request:**
     Push your branch to your fork and then open a pull request to the main repository. Please provide a clear and concise description of your changes in the pull request.
-
+Note: See https://github.com/users/Rishabh-Bajpai/projects/1 for the pending tasks
 ## Code of Conduct
 
-Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. (You can add a `CODE_OF_CONDUCT.md` file if you have one).
+Please note that this project is released with a Contributor Code of Conduct. By participating in this project, you agree to abide by its terms. (The `CODE_OF_CONDUCT.md` file will be added later).
 
 ## Suggestions and Ideas
 
