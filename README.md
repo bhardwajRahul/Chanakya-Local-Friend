@@ -71,7 +71,7 @@ We have many exciting features and improvements planned for Chanakya. Here's a l
 2. **Improved Asynchronous Handling:** Refactor and fix underlying asynchronous issues to improve stability and reduce the occurrence of 500 errors.
 3. **Switchable Personalities:** Introduce different personalities for the assistant, allowing users to choose the interaction style that suits them best.
 4. **Document Digestion (RAG):** Implement Retrieval-Augmented Generation (RAG) to allow Chanakya to read and understand documents, answering questions based on their content.
-5. **Custom Wake Words:** Allow users to define their own custom wake words for activating the assistant.
+5. **Auto correction on tool call failure:** The assistant will analyze the error and fix it by itself on tool call failure.
 6. **Enhanced Usability:** Focus on making the setup and configuration process easier for non-developers, potentially through a guided setup wizard in the UI.
 
 ## 📄 License
