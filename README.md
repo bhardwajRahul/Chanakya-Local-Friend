@@ -21,7 +21,7 @@ This guide will get you up and running in a few minutes. For more detailed instr
 1. **Clone the repository:**
     
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/Rishabh-Bajpai/Chanakya-Local-Friend.git
     cd chanakya-voice-assistant
     ```
 2. **Set up dependencies:**
