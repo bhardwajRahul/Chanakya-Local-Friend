@@ -64,7 +64,7 @@ Once the dependent services are running, you can start the Chanakya application.
 
 **1. Clone the Repository:**
 ```bash
-git clone <repository_url>
+git clone https://github.com/Rishabh-Bajpai/Chanakya-Local-Friend.git
 cd chanakya-voice-assistant
 ```
 
