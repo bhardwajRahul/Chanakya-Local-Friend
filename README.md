@@ -84,7 +84,7 @@ We have many exciting features and improvements planned for Chanakya. Here's a l
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](./docs/license.md) file for details.
+This project is licensed under the MIT License. See the [LICENSE](./license.md) file for details.
 
 ## 📈 Star History
 
