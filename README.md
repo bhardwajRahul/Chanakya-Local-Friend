@@ -2,6 +2,10 @@
 
 **Chanakya** is an advanced, open-source, and self-hostable voice assistant designed for privacy, power, and flexibility. It leverages local AI/ML models to ensure your data stays with you.
 
+
+
+![GitHub stars](https://img.shields.io/github/stars/Rishabh-Bajpai/Chanakya-Local-Friend?style=flat-square) ![GitHub forks](https://img.shields.io/github/forks/Rishabh-Bajpai/Chanakya-Local-Friend?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/Rishabh-Bajpai/Chanakya-Local-Friend?style=flat-square) ![GitHub pull requests](https://img.shields.io/github/issues-pr/Rishabh-Bajpai/Chanakya-Local-Friend?style=flat-square) ![License](https://img.shields.io/github/license/Rishabh-Bajpai/Chanakya-Local-Friend?style=flat-square)
+
 <div align="center">   <img src="./docs/resource/demo.png" alt="demo" width="200"/> </div>
 
 ## ✨ Key Features
@@ -19,34 +23,34 @@
 This guide will get you up and running in a few minutes. For more detailed instructions, please refer to our full documentation.
 
 1. **Clone the repository:**
-    
-    ```bash
-    git clone https://github.com/Rishabh-Bajpai/Chanakya-Local-Friend.git
-    cd chanakya-voice-assistant
-    ```
+   
+   ```bash
+   git clone https://github.com/Rishabh-Bajpai/Chanakya-Local-Friend.git
+   cd chanakya-voice-assistant
+   ```
 2. **Set up dependencies:**
-    
-    - Ensure [Docker](https://www.docker.com/) and [Ollama](https://ollama.com/) are installed and running.
-    - Pull the required Ollama models (e.g., `ollama pull hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL`).
-    - Run the dependent services for STT and TTS (see the [Getting Started Guide](./docs/getting-started.md) for details).
+   
+   - Ensure [Docker](https://www.docker.com/) and [Ollama](https://ollama.com/) are installed and running.
+   - Pull the required Ollama models (e.g., `ollama pull hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL`).
+   - Run the dependent services for STT and TTS (see the [Getting Started Guide](./docs/getting-started.md) for details).
 3. **Configure the application:**
-    
-    ```bash
-    cp .env.example .env
-    cp mcp_config_file.json.example mcp_config_file.json
-    ```
-    
-    - Edit `.env` and `mcp_config_file.json` with your settings. See the [Configuration Guide](./docs/configuration.md) for details.
+   
+   ```bash
+   cp .env.example .env
+   cp mcp_config_file.json.example mcp_config_file.json
+   ```
+   
+   - Edit `.env` and `mcp_config_file.json` with your settings. See the [Configuration Guide](./docs/configuration.md) for details.
 4. **Build and run with Docker:**
-    
-    ```bash
-    sudo docker build -t chanakya-assistant .
-    sudo docker run --restart=always -d --network="host" --env-file .env --name chanakya chanakya-assistant
-    ```
+   
+   ```bash
+   sudo docker build -t chanakya-assistant .
+   sudo docker run --restart=always -d --network="host" --env-file .env --name chanakya chanakya-assistant
+   ```
 5. **Access Chanakya:**
-    
-    - Open your browser and navigate to `http://localhost:5001`.
-    - For microphone access, HTTPS is required. See the [Deployment Guide](./docs/deployment.md) for instructions on setting up SSL.
+   
+   - Open your browser and navigate to `http://localhost:5001`.
+   - For microphone access, HTTPS is required. See the [Deployment Guide](./docs/deployment.md) for instructions on setting up SSL.
 
 ## 📚 Documentation
 
@@ -61,7 +65,11 @@ For detailed information about installation, configuration, features, and troubl
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](./docs/contributing.md) to get started.
+Contributions, issues, and feature requests are welcome!
+Check out the [Contributing Guide](docs/contributing.md).
+
+⭐ Don’t forget to give the project a star if you like it!
+
 
 ## Future Plans
 
@@ -77,4 +85,8 @@ We have many exciting features and improvements planned for Chanakya. Here's a l
 ## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](./docs/license.md) file for details.
+
+## 📈 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Rishabh-Bajpai/Chanakya-Local-Friend&type=Date)](https://star-history.com/#Rishabh-Bajpai/Chanakya-Local-Friend&Date)
 
