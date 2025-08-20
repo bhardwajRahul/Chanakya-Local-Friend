@@ -9,7 +9,6 @@ venv/
 .env
 mcp_config_file.json 
 # Any other local config files or build artifacts
-database/*
 client_count.txt
 output.wav
 chanakya.log
