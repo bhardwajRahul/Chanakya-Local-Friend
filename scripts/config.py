@@ -17,9 +17,21 @@ LLM_NUM_CTX = int(os.environ.get('LLM_NUM_CTX', 2048))
 LLM_API_KEY = os.environ.get('LLM_API_KEY') # For OpenAI-compatible endpoints
 
 # Configuration for a smaller, secondary model (optional)
-LLM_ENDPOINT_SMALL = os.environ.get('LLM_ENDPOINT_SMALL')
-LLM_MODEL_NAME_SMALL = os.environ.get('LLM_MODEL_NAME_SMALL')
-LLM_NUM_CTX_SMALL = int(os.environ.get('LLM_NUM_CTX_SMALL', 2048))
+# If these are not set in the .env file, they will fall back to the primary model's configuration.
+# If they are set to an empty string, query refinement will be disabled.
+llm_endpoint_small_env = os.environ.get('LLM_ENDPOINT_SMALL')
+LLM_ENDPOINT_SMALL = llm_endpoint_small_env if llm_endpoint_small_env is not None else LLM_ENDPOINT
+
+llm_model_name_small_env = os.environ.get('LLM_MODEL_NAME_SMALL')
+LLM_MODEL_NAME_SMALL = llm_model_name_small_env if llm_model_name_small_env is not None else LLM_MODEL_NAME
+
+llm_num_ctx_small_env = os.environ.get('LLM_NUM_CTX_SMALL')
+if llm_num_ctx_small_env is not None:
+    # If the variable is set, use it. If it's an empty string, use the default from the original code.
+    LLM_NUM_CTX_SMALL = int(llm_num_ctx_small_env) if llm_num_ctx_small_env else 2048
+else:
+    # If the variable is not set at all, fall back to the main model's context size.
+    LLM_NUM_CTX_SMALL = LLM_NUM_CTX
 
 # stt and tts Configuration
 STT_SERVER_URL = os.environ.get('STT_SERVER_URL') # Default STT API URL

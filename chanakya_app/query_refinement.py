@@ -17,7 +17,6 @@ def get_query_refinement_chain():
     provider = config.LLM_PROVIDER.lower()
     app.logger.info(f"Configuring Query Refinement LLM with provider: {provider}")
 
-    # Only initialize if the small model is configured
     if not config.LLM_MODEL_NAME_SMALL or not config.LLM_ENDPOINT_SMALL:
         app.logger.warning("Small LLM not configured, query refinement will be disabled.")
         return None

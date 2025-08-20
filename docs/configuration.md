@@ -6,14 +6,16 @@ Chanakya is configured using two main files: `.env` for environment variables an
 
 Create a `.env` file in the root of the project (you can copy `.env.example`). This file contains the core configuration for Chanakya.
 
-| Variable                    | Description                                                                                         | Example                                                      |
-| --------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `OLLAMA_ENDPOINT`           | The URL of your main Ollama LLM endpoint.                                                           | `http://localhost:11434`                                     |
-| `OLLAMA_MODEL_NAME`         | The name of the Ollama model to use for the main agent.                                             | `hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL` |
-| `OLLAMA_NUM_CTX`            | The context window size for the main LLM.                                                           | `18000`                                                      |
-| `OLLAMA_ENDPOINT_SMALL`     | The URL of your secondary Ollama LLM endpoint (can be the same as the main one).                    | `http://localhost:11434`                                     |
-| `OLLAMA_MODEL_NAME_SMALL`   | The name of the Ollama model to use for query refinement.                                           | `hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL` |
-| `OLLAMA_NUM_CTX_SMALL`      | The context window size for the small LLM.                                                          | `8000`                                                       |
+| Variable                    | Description                                                                                                                                     | Example                                                      |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `LLM_PROVIDER`              | The provider for your LLM. Can be `ollama` or `openai` (for any OpenAI-compatible API like LM Studio). Defaults to `ollama`.                     | `openai`                                                     |
+| `LLM_ENDPOINT`              | The URL of your main LLM endpoint. For Ollama, this is the server URL. For OpenAI-compatible APIs, this is the base URL.                          | `http://localhost:1234/v1`                                   |
+| `LLM_MODEL_NAME`            | The name of the model to use for the main agent.                                                                                                | `your-model-name`                                            |
+| `LLM_NUM_CTX`               | The context window size for the main LLM.                                                                                                       | `4096`                                                       |
+| `LLM_API_KEY`               | Your API key for OpenAI-compatible endpoints. For local servers like LM Studio, this can often be left blank or set to a dummy value.           | `sk-12345`                                                   |
+| `LLM_ENDPOINT_SMALL`        | (Optional) The URL for a secondary, smaller LLM for tasks like query refinement. If empty, defaults to `LLM_ENDPOINT`.                           | `http://localhost:1234/v1`                                   |
+| `LLM_MODEL_NAME_SMALL`      | (Optional) The name of the smaller model. If empty, defaults to `LLM_MODEL_NAME`.                                                               | `your-small-model-name`                                      |
+| `LLM_NUM_CTX_SMALL`         | (Optional) The context window size for the smaller model. If empty, defaults to `LLM_NUM_CTX`.                                                  | `2048`                                                       |
 | `STT_SERVER_URL`            | The URL of your Speech-to-Text (STT) server.                                                        | `http://localhost:8000/v1/audio/transcriptions`              |
 | `TTS_ENGINE`                | The Text-to-Speech (TTS) engine to use. Can be`coqui` or `piper`.                                   | `coqui`                                                      |
 | `TTS_SERVER_URL`            | The URL of your Text-to-Speech (TTS) server.                                                        | `http://localhost:5002/api/tts`                              |
