@@ -41,7 +41,7 @@ This guide will get you up and running in a few minutes. For more detailed instr
    ```
    
    - Edit `.env` and `mcp_config_file.json` with your settings. See the [Configuration Guide](./docs/configuration.md) for details.
-4. **Build and run with Docker:**
+4. **Build and run with Docker:  or (for [Local Python Environment](./docs/getting-started.md))**
    
    ```bash
    sudo docker build -t chanakya-assistant .
