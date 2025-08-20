@@ -9,13 +9,17 @@ APP_SECRET_KEY = os.environ.get('APP_SECRET_KEY', str(os.urandom(24))) # Use env
 DEBUG_MODE = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
 WAKE_WORD = os.environ.get('WAKE_WORD', "Chanakya")
 
-# Ollama Configuration
-OLLAMA_ENDPOINT = os.environ.get('OLLAMA_ENDPOINT')
-OLLAMA_MODEL_NAME = os.environ.get('OLLAMA_MODEL_NAME') # hf.co/NikolayKozloff/Jan-nano-Q8_0-GGUF:latest qwen3:30b
-OLLAMA_NUM_CTX = int(os.environ.get('OLLAMA_NUM_CTX', 2048))
-OLLAMA_ENDPOINT_SMALL = os.environ.get('OLLAMA_ENDPOINT_SMALL')
-OLLAMA_MODEL_NAME_SMALL = os.environ.get('OLLAMA_MODEL_NAME_SMALL') # Example change
-OLLAMA_NUM_CTX_SMALL = int(os.environ.get('OLLAMA_NUM_CTX_SMALL', 2048))
+# LLM Configuration
+LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'ollama')  # Default to 'ollama'
+LLM_ENDPOINT = os.environ.get('LLM_ENDPOINT')
+LLM_MODEL_NAME = os.environ.get('LLM_MODEL_NAME') # e.g., hf.co/NikolayKozloff/Jan-nano-Q8_0-GGUF:latest
+LLM_NUM_CTX = int(os.environ.get('LLM_NUM_CTX', 2048))
+LLM_API_KEY = os.environ.get('LLM_API_KEY') # For OpenAI-compatible endpoints
+
+# Configuration for a smaller, secondary model (optional)
+LLM_ENDPOINT_SMALL = os.environ.get('LLM_ENDPOINT_SMALL')
+LLM_MODEL_NAME_SMALL = os.environ.get('LLM_MODEL_NAME_SMALL')
+LLM_NUM_CTX_SMALL = int(os.environ.get('LLM_NUM_CTX_SMALL', 2048))
 
 # stt and tts Configuration
 STT_SERVER_URL = os.environ.get('STT_SERVER_URL') # Default STT API URL

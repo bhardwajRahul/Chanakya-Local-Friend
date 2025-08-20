@@ -9,6 +9,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.agents.format_scratchpad import format_log_to_str
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 import scripts.config as config
 from .app_setup import app
 from . import tool_loader
@@ -175,13 +176,28 @@ class CustomReActSingleInputOutputParser(AgentOutputParser):
 
 
 def get_chanakya_react_agent_with_history():
-    current_chanakya_llm = ChatOllama(
-        model=config.OLLAMA_MODEL_NAME,
-        base_url=config.OLLAMA_ENDPOINT,
-        num_ctx=config.OLLAMA_NUM_CTX,
-        temperature=0.1,
-        stop=["\nObservation:", "\n\tObservation:"]
-    )
+    provider = config.LLM_PROVIDER.lower()
+    app.logger.info(f"Configuring LLM with provider: {provider}")
+
+    if provider == 'ollama':
+        current_chanakya_llm = ChatOllama(
+            model=config.LLM_MODEL_NAME,
+            base_url=config.LLM_ENDPOINT,
+            num_ctx=config.LLM_NUM_CTX,
+            temperature=0.1,
+            stop=["\nObservation:", "\n\tObservation:"]
+        )
+    elif provider == 'openai' or provider == 'lmstudio':
+        current_chanakya_llm = ChatOpenAI(
+            model=config.LLM_MODEL_NAME,
+            base_url=config.LLM_ENDPOINT,
+            api_key=config.LLM_API_KEY or "NA", # Some servers need a dummy key
+            temperature=0.1,
+            max_tokens=1500, # A reasonable default
+            stop=["\nObservation:", "\n\tObservation:"]
+        )
+    else:
+        raise ValueError(f"Unsupported LLM_PROVIDER: {config.LLM_PROVIDER}")
 
     current_tools = tool_loader.CACHED_MCP_TOOLS
     if not current_tools:
