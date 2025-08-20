@@ -13,3 +13,4 @@ langchain_mcp_adapters
 flask[async]
 uv
 pyOpenSSL
+langchain_openai
