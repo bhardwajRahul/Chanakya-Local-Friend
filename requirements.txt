@@ -7,8 +7,10 @@ chatterbox-tts
 flask
 flask_cors
 langchain_ollama
+langchain_openai
 langchain
 langchain_mcp_adapters
 flask[async]
 uv
 pyOpenSSL
+langchain_core
