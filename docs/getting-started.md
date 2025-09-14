@@ -40,11 +40,10 @@ Before you run Chanakya, you must have the dependent services (Ollama, STT, and 
 - This service provides high-performance speech-to-text.
 - We recommend using the official Docker Compose setup:
   ```bash
-  curl -sO https://raw.githubusercontent.com/fedirz/faster-whisper-server/master/compose.yaml
   # For CUDA (NVIDIA GPU):
-  docker compose up --detach faster-whisper-server-cuda
+  docker run -d --gpus=all --publish 8000:8000 --restart unless-stopped --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
   # For CPU:
-  # docker compose up --detach faster-whisper-server-cpu
+  # docker run -d --publish 8000:8000 --restart unless-stopped --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu
   ```
 - This will start the STT server on port `8000`.
 
